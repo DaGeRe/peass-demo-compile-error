@@ -24,6 +24,38 @@ echo "RIGHT_SHA: $RIGHT_SHA"
 echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
 ./peass select -folder $DEMO_HOME
 
+echo ":::::::::::::::::::::MEASURE::::::::::::::::::::::::::::::::::::::::::"
+./peass measure -executionfile $EXECUTION_FILE -folder $DEMO_HOME -iterations 1 -warmup 0 -repetitions 1 -vms 2
+
+echo "::::::::::::::::::::GETCHANGES::::::::::::::::::::::::::::::::::::::::"
+./peass getchanges -data $DEMO_PROJECT_PEASS -dependencyfile $DEPENDENCY_FILE
+
+# If minor updates to the project occur, the version name may change
+VERSION=$(grep '"testcases" :' -B 1 $EXECUTION_FILE | head -n 1 | tr -d "\": {")
+echo "VERSION: $VERSION"
+
+echo "::::::::::::::::::::SEARCHCAUSE:::::::::::::::::::::::::::::::::::::::"
+./peass searchcause -vms 5 -iterations 1 -warmup 0 -version $VERSION \
+    -test de.test.CalleeTest\#onlyCallMethod1 \
+    -folder $DEMO_HOME \
+    -executionfile $EXECUTION_FILE
+
+echo "::::::::::::::::::::VISUALIZERCA::::::::::::::::::::::::::::::::::::::"
+./peass visualizerca -data $DEMO_PROJECT_PEASS -propertyFolder $PROPERTY_FOLDER
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#Measure again with a version which has no compile error
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+cd $DEMO_HOME && git pull
+RIGHT_SHA="$(cd "$DEMO_HOME" && git rev-parse HEAD)"
+echo "RIGHT_SHA: $RIGHT_SHA"
+
+cd ../peass
+
+# It is assumed that $DEMO_HOME is set correctly and PeASS has been built!
+echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
+./peass select -folder $DEMO_HOME
+
 if [ ! -f "$EXECUTION_FILE" ]
 then
     echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
