@@ -3,7 +3,8 @@ DEMO_PROJECT_NAME=demo-project-compile-error
 
 git clone https://github.com/mai13drd/demo-project-compile-error && \
     cd  demo-project-compile-error && \
-    git reset --hard ec6b3b4512d94552a8fa1a12862aae2674869f20
+    git reset --hard ec6b3b4512d94552a8fa1a12862aae2674869f20 && \
+    cd ..
 
 git clone https://github.com/DaGeRe/peass.git && \
 	cd peass && \
