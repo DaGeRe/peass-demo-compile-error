@@ -36,7 +36,7 @@ echo "VERSION: $VERSION"
 
 echo "::::::::::::::::::::SEARCHCAUSE:::::::::::::::::::::::::::::::::::::::"
 ./peass searchcause -vms 5 -iterations 1 -warmup 0 -version $VERSION \
-    -test de.test.CalleeTest\#onlyCallMethod1 \
+    -test de.dagere.peass.CalleeTest\#onlyCallMethod1 \
     -folder $DEMO_HOME \
     -executionfile $EXECUTION_FILE
 
