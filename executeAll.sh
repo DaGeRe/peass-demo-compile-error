@@ -24,25 +24,6 @@ echo "RIGHT_SHA: $RIGHT_SHA"
 echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
 ./peass select -folder $DEMO_HOME
 
-echo ":::::::::::::::::::::MEASURE::::::::::::::::::::::::::::::::::::::::::"
-./peass measure -executionfile $EXECUTION_FILE -folder $DEMO_HOME -iterations 1 -warmup 0 -repetitions 1 -vms 2
-
-echo "::::::::::::::::::::GETCHANGES::::::::::::::::::::::::::::::::::::::::"
-./peass getchanges -data $DEMO_PROJECT_PEASS -dependencyfile $DEPENDENCY_FILE
-
-# If minor updates to the project occur, the version name may change
-VERSION=$(grep '"testcases" :' -B 1 $EXECUTION_FILE | head -n 1 | tr -d "\": {")
-echo "VERSION: $VERSION"
-
-echo "::::::::::::::::::::SEARCHCAUSE:::::::::::::::::::::::::::::::::::::::"
-./peass searchcause -vms 5 -iterations 1 -warmup 0 -version $VERSION \
-    -test de.dagere.peass.CalleeTest\#onlyCallMethod1 \
-    -folder $DEMO_HOME \
-    -executionfile $EXECUTION_FILE
-
-echo "::::::::::::::::::::VISUALIZERCA::::::::::::::::::::::::::::::::::::::"
-./peass visualizerca -data $DEMO_PROJECT_PEASS -propertyFolder $PROPERTY_FOLDER
-
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #Measure again with a version which has no compile error
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,7 +68,7 @@ echo "VERSION: $VERSION"
 
 echo "::::::::::::::::::::SEARCHCAUSE:::::::::::::::::::::::::::::::::::::::"
 ./peass searchcause -vms 5 -iterations 1 -warmup 0 -version $VERSION \
-    -test de.test.CalleeTest\#onlyCallMethod1 \
+    -test de.dagere.peass.CalleeTest\#onlyCallMethod1 \
     -folder $DEMO_HOME \
     -executionfile $EXECUTION_FILE
 
@@ -95,20 +76,20 @@ echo "::::::::::::::::::::VISUALIZERCA::::::::::::::::::::::::::::::::::::::"
 ./peass visualizerca -data $DEMO_PROJECT_PEASS -propertyFolder $PROPERTY_FOLDER
 
 #Check, if a slowdown is detected for innerMethod
-STATE=$(grep '"call" : "de.test.Callee#innerMethod",\|state' results/$VERSION/de.test.CalleeTest_onlyCallMethod1.js \
+STATE=$(grep '"call" : "de.dagere.peass.Callee#innerMethod",\|state' results/$VERSION/de.dagere.peass.CalleeTest_onlyCallMethod1.js \
     | grep "innerMethod" -A 1 \
     | grep '"state" : "SLOWER",' \
     | grep -o 'SLOWER')
 if [ "$STATE" != "SLOWER" ]
 then
-    echo "State for de.test.Callee#innerMethod in de.test.CalleeTest#onlyCallMethod1.html has not the expected value SLOWER, but was $STATE!"
-    cat results/$VERSION/de.test.CalleeTest_onlyCallMethod1.js
+    echo "State for de.dagere.peass.Callee#innerMethod in de.dagere.peass.CalleeTest#onlyCallMethod1.html has not the expected value SLOWER, but was $STATE!"
+    cat results/$VERSION/de.dagere.peass.CalleeTest_onlyCallMethod1.js
     exit 1
 else
     echo "Slowdown is detected for innerMethod."
 fi
 
-SOURCE_METHOD_LINE=$(grep "de.test.Callee.method1_" results/$VERSION/de.test.CalleeTest_onlyCallMethod1.js -A 3 \
+SOURCE_METHOD_LINE=$(grep "de.dagere.peass.Callee.method1_" results/$VERSION/de.dagere.peass.CalleeTest_onlyCallMethod1.js -A 3 \
     | head -n 3 \
     | grep innerMethod)
 if [[ "$SOURCE_METHOD_LINE" != *"innerMethod();" ]]
