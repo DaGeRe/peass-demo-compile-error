@@ -7,7 +7,13 @@ git clone https://github.com/mai13drd/demo-project-compile-error && \
     git reset --hard 577bb7f03abbb8855232fe22adac9966c7c178fb && \
     cd ..
 
-git clone https://github.com/DaGeRe/peass.git && \
+if [ "$#" -ne 1 ]; then
+	branch="master"
+else
+	branch=$1
+fi
+
+git clone -b $branch https://github.com/DaGeRe/peass.git && \
 	cd peass && \
 	./mvnw clean install -DskipTests -V
 
