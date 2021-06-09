@@ -25,7 +25,6 @@ CHANGES_DEMO_PROJECT=results/changes_"$DEMO_PROJECT_NAME".json
 PROPERTY_FOLDER=results/properties_"$DEMO_PROJECT_NAME"/
 
 VERSION="$(cd "$DEMO_HOME" && git rev-parse HEAD)"
-echo "VERSION: $VERSION"
 
 # It is assumed that $DEMO_HOME is set correctly and PeASS has been built!
 echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
@@ -36,13 +35,20 @@ echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 cd $DEMO_HOME && git pull
 VERSION="$(cd "$DEMO_HOME" && git rev-parse HEAD)"
-echo "VERSION: $VERSION"
 
 cd ../peass
 
 # It is assumed that $DEMO_HOME is set correctly and PeASS has been built!
 echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
 ./peass select -folder $DEMO_HOME
+
+INITIALVERSION="696131783b5ea6b9299b45a888d0f60f38547547"
+INITIAL_SELECTED=$(grep "initialversion" -A 1 $DEPENDENCY_FILE | grep "\"version\"" | tr -d " \"," | awk -F':' '{print $2}')
+if [ "$INITIAL_SELECTED" != "$INITIALVERSION" ]
+then
+	echo "Initialversion should be $INITIALVERSION, but was $INITIAL_SELECTED"
+	exit 1
+fi
 
 if [ ! -f "$EXECUTION_FILE" ]
 then
@@ -53,7 +59,7 @@ then
 fi
 
 echo ":::::::::::::::::::::MEASURE::::::::::::::::::::::::::::::::::::::::::"
-./peass measure -executionfile $EXECUTION_FILE -folder $DEMO_HOME -iterations 1 -warmup 0 -repetitions 1 -vms 2
+./peass measure -executionfile $EXECUTION_FILE -folder $DEMO_HOME -vms 5 -iterations 5 -warmup 5 -repetitions 5
 
 echo "::::::::::::::::::::GETCHANGES::::::::::::::::::::::::::::::::::::::::"
 ./peass getchanges -data $DEMO_PROJECT_PEASS -dependencyfile $DEPENDENCY_FILE
@@ -62,7 +68,7 @@ echo "::::::::::::::::::::GETCHANGES::::::::::::::::::::::::::::::::::::::::"
 TEST_SHA=$(grep -A1 'versionChanges" : {' $CHANGES_DEMO_PROJECT | grep -v '"versionChanges' | grep -Po '"\K.*(?=")')
 if [ "$VERSION" != "$TEST_SHA" ]
 then
-    echo "commit-SHA ("$VERSION") is not equal to the SHA in $CHANGES_DEMO_PROJECT ("$TEST_SHA")"
+    echo "commit-SHA ("$VERSION") is not equal to the SHA in $CHANGES_DEMO_PROJECT ("$TEST_SHA")!"
     cat results/statistics/"$DEMO_PROJECT_NAME".json
     exit 1
 else
@@ -70,7 +76,7 @@ else
 fi
 
 echo "::::::::::::::::::::SEARCHCAUSE:::::::::::::::::::::::::::::::::::::::"
-./peass searchcause -vms 5 -iterations 1 -warmup 0 -version $VERSION \
+./peass searchcause -vms 3 -iterations 5 -warmup 1 -repetitions 5 -version $VERSION \
     -test de.dagere.peass.ExampleTest\#test \
     -folder $DEMO_HOME \
     -executionfile $EXECUTION_FILE
