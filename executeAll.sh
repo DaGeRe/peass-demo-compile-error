@@ -2,10 +2,7 @@
 
 DEMO_PROJECT_NAME=demo-project-compile-error
 
-git clone https://github.com/mai13drd/demo-project-compile-error && \
-    cd  demo-project-compile-error && \
-    git reset --hard 577bb7f03abbb8855232fe22adac9966c7c178fb && \
-    cd ..
+git clone https://github.com/mai13drd/demo-project-compile-error
 
 if [ "$#" -ne 1 ]; then
 	branch="master"
@@ -24,22 +21,18 @@ DEPENDENCY_FILE=results/deps_"$DEMO_PROJECT_NAME".json
 CHANGES_DEMO_PROJECT=results/changes_"$DEMO_PROJECT_NAME".json
 PROPERTY_FOLDER=results/properties_"$DEMO_PROJECT_NAME"/
 
-VERSION="$(cd "$DEMO_HOME" && git rev-parse HEAD)"
-
 # It is assumed that $DEMO_HOME is set correctly and PeASS has been built!
 echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
+cd $DEMO_HOME && git checkout 577bb7f && cd ../peass
 ./peass select -folder $DEMO_HOME
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #Measure again with a version which has no compile error
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-cd $DEMO_HOME && git pull
-VERSION="$(cd "$DEMO_HOME" && git rev-parse HEAD)"
-
-cd ../peass
 
 # It is assumed that $DEMO_HOME is set correctly and PeASS has been built!
 echo ":::::::::::::::::::::SELECT:::::::::::::::::::::::::::::::::::::::::::"
+cd $DEMO_HOME && git checkout main && cd ../peass
 ./peass select -folder $DEMO_HOME
 
 INITIALVERSION="696131783b5ea6b9299b45a888d0f60f38547547"
@@ -65,6 +58,7 @@ echo "::::::::::::::::::::GETCHANGES::::::::::::::::::::::::::::::::::::::::"
 ./peass getchanges -data $DEMO_PROJECT_PEASS -dependencyfile $DEPENDENCY_FILE
 
 #Check, if $CHANGES_DEMO_PROJECT contains the correct commit-SHA
+VERSION="$(cd "$DEMO_HOME" && git rev-parse HEAD)"
 TEST_SHA=$(grep -A1 'versionChanges" : {' $CHANGES_DEMO_PROJECT | grep -v '"versionChanges' | grep -Po '"\K.*(?=")')
 if [ "$VERSION" != "$TEST_SHA" ]
 then
