@@ -2,7 +2,7 @@
 
 DEMO_PROJECT_NAME=demo-project-compile-error
 
-git clone https://github.com/mai13drd/demo-project-compile-error
+tar -xf demo-project-compile-error.tar.xz
 
 if [ "$#" -ne 1 ]; then
 	branch="master"
