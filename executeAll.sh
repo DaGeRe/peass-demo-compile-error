@@ -5,7 +5,7 @@ DEMO_PROJECT_NAME=demo-project-compile-error
 tar -xf demo-project-compile-error.tar.xz
 
 if [ "$#" -ne 1 ]; then
-	branch="master"
+	branch="main"
 else
 	branch=$1
 fi
